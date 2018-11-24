@@ -186,7 +186,8 @@ public class DynamicArray<E> {
 分析时间复杂度我们一般考虑最坏的情况。
 O(1):getCapacity、getSize、set、removeLast、addFirst、get、addFirst
 O(n):resize、removeElement、removeFirst、remove、find、contains、add、addFirst
-均摊复杂度（amortized time complexity）：在扩容的时候，不是每一次都会触发resize操作，因此根据均摊法我们们可以知道他的时间复杂度也是O(1)的。复杂度震荡解决方法：当前元素的个数为数组容量的１/4时（size = capacity/4），缩减数组容量为原来的1/2（capacity = capacity/2），就能有效解决复杂度震荡。
+## 均摊复杂度（amortized time complexity）
+在扩容的时候，不是每一次都会触发resize操作，因此根据均摊法我们们可以知道他的时间复杂度也是O(1)的。复杂度震荡解决方法：当前元素的个数为数组容量的１/4时（size = capacity/4），缩减数组容量为原来的1/2（capacity = capacity/2），就能有效解决复杂度震荡。
    
 # 二、容器中的设计模式
 

@@ -24,6 +24,7 @@
 
 # 一、数组
 ##　source code
+
 public class DynamicArray<E> {
 
     /**

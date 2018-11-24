@@ -189,16 +189,217 @@ O(n):resize、removeElement、removeFirst、remove、find、contains、add、add
 ## 均摊复杂度（amortized time complexity）
 在扩容的时候，不是每一次都会触发resize操作，因此根据均摊法我们们可以知道他的时间复杂度也是O(1)的。复杂度震荡解决方法：当前元素的个数为数组容量的１/4时（size = capacity/4），缩减数组容量为原来的1/2（capacity = capacity/2），就能有效解决复杂度震荡。
    
-# 二、容器中的设计模式
+# 三、栈（Last In First Out）
+##　栈的应用
+无处不在的 Undo 操作（撤销操作）
+程序调用的系统栈
+括号匹配
+## 栈的实现
+Interface Stack<E> 
+### void push(E)        往栈中提交元素
+### E pop()             删除栈顶元素
+### E peek()            查看栈顶元素
+### int getSize()     　获取栈元素个数
+### boolean isEmpty()   栈是否为空
 
-## 迭代器模式
+# 四、队列（First In First Out）
+##ArrayQueue<E>                                              时间复杂度
+### void enQueue(E)     向队列中提交元素                   O(1)
+### E deQueue()         删除队列队首元素                   O(n)
+### E getFront()        查看队列队首元素                   O(1)   
+### int getSize()       获取队列元素个数                   O(1)
+### boolean isEmpty()   队列是否为空                      O(1)
+## source code
 
-## 适配器模式
+### Interface Queue<E>
+public interface Queue<E> {
+    void enQueue(E e);
+    E deQueue();
+    E getFront();
+    int getSize();
+    boolean isEmpty();
+}
 
-# 三、源码分析
+### ArrayQueue
+public class ArrayQueue<E> implements Queue<E>{
+    //动态数组
+    private DynamicArray<E> array;
+    
+    public ArrayQueue(int capacity,Class type){
+        array = new DynamicArray<>(capacity,type);
+    }
+
+    public ArrayQueue(Class type){
+        this(10,type);
+    }
+    //获取队列中元素个数
+    @Override
+    public int getSize(){
+        return array.getSize();
+    }
+    //获取队首元素
+    @Override
+    public E getFront(){
+        return array.get(0);
+    }
+    //取出队首元素
+    @Override
+    public E deQueue(){
+        return array.removeFirst();
+    }
+    //判断队列是否为空
+    @Override
+    public boolean isEmpty(){
+        return array.getSize() == 0;
+    }
+    //向队列中添加元素
+    @Override
+    public void enQueue(E e){
+        array.addLast(e);
+    }
+    @Override
+    public String toString(){
+
+        StringBuilder res = new StringBuilder();
+        res.append(String.format("ArrayQueue: size = %d , capacity = %d", array.getSize(), array.getCapacity()));
+        res.append("front [");
+        for(int i = 0 ; i < array.getSize() ; i ++){
+            res.append(array.get(i));
+            if(i != array.getSize() - 1)
+                res.append(",");
+        }
+        res.append(']');
+        return res.toString();
+    }
+
+}
+
+   
+   
+##　循环队列（因为在基于动态数组实现的队列中，每次出队操作时间复杂度都为O(n)，循环队列通过设置双指针的方法来达到出队入队的时间复杂度都为O(1)，因此，与动态数组的队列相比，循环队列具有更好的性能），循环队列要实现"循环"的效果，在移动 front 和　tail 指针的时候需要对数组的长度取余操作，下面的代码中需要可以维护　size，在resize方法中需要注意size的值。
+## LoopQueue<E>                                              时间复杂度
+### void enQueue(E)     向队列中提交元素                   O(1)
+### E deQueue()         删除队列队首元素                   O(1)
+### E getFront()        查看队列队首元素                   O(1)   
+### int getSize()       获取队列元素个数                   O(1)
+### boolean isEmpty()   队列是否为空                      O(1)
+### source code
+public class LoopQueue<E> implements Queue<E> {
+    
+    /**
+     * 数组
+     */
+    private E[] data;
+    /**
+     * 头指针
+     */
+   
+    private int front;
+    /**
+     * 头指针
+     */
+   
+    private int tail;
+    /**
+     * 保存泛型的类型
+     */
+   
+    private Class type;
+    public LoopQueue(int capacity,Class type){
+        this.type = type;
+        data = (E[]) Array.newInstance(type,capacity + 1);
+        front = 0;
+        tail = 0;
+    }
+   
+    public LoopQueue(Class type){
+        this(10,type);
+    }
+   
+    //获取元素个数
+    @Override
+    public int getSize(){
+        if(isEmpty()){
+            return 0;
+        }
+        /*如果tail在front的右边,直接相减得到size,如果 tail 在 front 右边,则size =(data.length - (front - tail ) */
+        return tail > front ? (tail - front ) : (data.length - (front - tail ));
+    }
+   
+    //循环队列是否为空
+    @Override
+    public boolean isEmpty(){
+        return tail == front;
+    }
+   
+    //循环队列可承载的元素个数
+    public int getCapacity(){
+        return data.length - 1;
+    }
+   
+    //入队操作,可自动进行扩容
+    @Override
+    public void enQueue(E e){
+        if((tail + 1) % data.length == front){  //队列为满时,扩大为原来的两倍
+            resize(getCapacity() * 2);
+        }
+        data[tail] = e;
+        tail = (tail + 1) % data.length;
+    }
+
+    @Override
+    public E deQueue(){
+        if(isEmpty()){//当前没有元素可以删除
+            throw new RuntimeException("The LoopQueue is empty,cannot remove element again!");
+        }
+        E ret = data[front];
+        data[front] = null;
+        front = (front + 1) % data.length;
+        //这里进行的的是缩容处理,我们使用的比较lazy的策略能够有效的避免复杂度震荡的情况
+        if((getSize() == (getCapacity() / 4)) && (getCapacity() /2 != 0)){
+            resize(getCapacity() / 2);
+        }
+        return ret;
+    }
+
+    private void resize(int capacity){
+        int size = getSize();  //因为这个类中没有专门的变量维护size,需要先获取size
+        //有一个额外的空间浪费
+        E[] newData = (E[])Array.newInstance(type,capacity + 1);
+        for (int i = 0; i < getSize(); i++) {
+            newData[i] = data[(i+front) % data.length];
+        }
+        data = newData;
+        /*扩容后修改 front tail 的指向*/
+        front = 0;
+        tail = size;
+    }
+    @Override
+    public E getFront(){
+        if(isEmpty()){
+            return null;
+        }
+        return data[front];
+    }
+
+    @Override
+    public String toString(){
+        StringBuilder res = new StringBuilder();
+        res.append(String.format("LoopQueue: size = %d , capacity = %d  ", getSize(), getCapacity()));
+        res.append("front [");
+        for(int i = front ; i != tail ; i = (i + 1) % data.length){
+            res.append(data[i]);
+            if((i + 1)% data.length != tail)
+                res.append(", ");
+        }
+        res.append("] tail");
+        return res.toString();
+    }
+}
 
 
-### 1. 概览
+
+
 
 
              

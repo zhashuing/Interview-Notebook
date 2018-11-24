@@ -8,7 +8,7 @@
 * [三、Linux如何学习](#三Linux如何学习)
 * [四、主机规划与磁盘分区](#四主机规划与磁盘分区)
 * [五、安装Linux和多重引导小技巧](#[五安装Linux和多重引导小技巧)
-* [六、首次登陆和在线帮助man page](#六首次登陆和在线帮助man page)
+* [六、首次登陆和在线帮助man page ](#六首次登陆和在线帮助man page)
 * [六、首次登陆和在线帮助(man page)](#六首次登陆和在线帮助(man page))
 * [七、Linux的文件权限与目录配置](#七Linux的文件权限与目录配置)
 * [八、Linux文件与目录管理](#八Linux文件与目录管理)
@@ -30,8 +30,18 @@
 <!-- GFM-TOC -->
 
 # 一、计算机概论
-## Collection
-### 1. Set
+## 计算机概述
+### 计算机组成部分
+输入单元、CPU内部的控制单元、输出单元、算数逻辑单元和内存五个部分。
+### CPU的种类
+RISC(Reduced Instruction System Computer): 精简指令集系统
+CISC(Complex Instruction System Computer): 复杂指令集系统
+## 计算机设备
+### 32位与64位
+CPU 每次能够处理的数据量称为子组大小（word size)，子组大小根据 CPU 的设计而有 32 位和 64 位。我们所说的 32 位和 64 主要是依据 CPU 解析的子组大小而来的。
+### 硬盘接口类型
+IDE 接口和 SATA 接口
+###
 # 二、容器中的设计模式
 
 ## 迭代器模式
